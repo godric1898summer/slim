@@ -8,15 +8,24 @@
 
 require '../vendor/autoload.php';
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+(new \Symfony\Component\Dotenv\Dotenv(false))->loadEnv(dirname(__DIR__) . "/.env.local");
 
-$app = new \Slim\App;
-$app->get('/user/{name}', function (Request $request, Response $response) {
-    $name = $request->getAttribute('name');
-    $response->getBody()->write("Hello, $name");
+$env = $_ENV['APP_ENV']??'local';
 
-    return $response;
-});
+$debug = $_ENV['APP_DEBUG']??false;
 
+if($debug){
+    \Symfony\Component\Debug\Debug::enable();
+    \Symfony\Component\Debug\ExceptionHandler::register();
+}
+
+// 加载配置
+$config = @include dirname(__DIR__) . "/config/config.$env.php";
+
+if(false === $config){
+    throw new \Symfony\Component\Dotenv\Exception\PathException('config file does not exist');
+}
+
+$app = new \Slim\App($config);
+include dirname(__DIR__) . "/config/router.php";
 $app->run();
