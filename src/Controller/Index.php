@@ -27,7 +27,8 @@ class Index
     protected $container;
 
     /**
-     * IndexController constructor.
+     * @author akio <medue8@gmail.com>
+     * Index constructor.
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)

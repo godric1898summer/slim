@@ -6,9 +6,11 @@
  * Time: 14:42
  */
 
-require '../vendor/autoload.php';
+define('APP_ROOT', dirname(__DIR__));
 
-(new \Symfony\Component\Dotenv\Dotenv(false))->loadEnv(dirname(__DIR__) . "/.env.local");
+require APP_ROOT . '/vendor/autoload.php';
+
+(new \Symfony\Component\Dotenv\Dotenv(false))->loadEnv(APP_ROOT . "/.env.local");
 
 $env = $_ENV['APP_ENV']??'local';
 
@@ -20,12 +22,15 @@ if($debug){
 }
 
 // 加载配置
-$config = @include dirname(__DIR__) . "/config/config.$env.php";
+$config = @include APP_ROOT . "/config/config.$env.php";
 
 if(false === $config){
     throw new \Symfony\Component\Dotenv\Exception\PathException('config file does not exist');
 }
 
-$app = new \Slim\App($config);
-include dirname(__DIR__) . "/config/router.php";
+@include APP_ROOT . "/src/bootstrap.php";
+
+$app = new \Slim\App($container);
+include APP_ROOT . "/config/router.php";
+
 $app->run();
