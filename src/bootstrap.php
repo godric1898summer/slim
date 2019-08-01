@@ -21,6 +21,21 @@ $env = $_ENV['APP_ENV']??'local';
 
 $container = new Container(require APP_ROOT . "/config/config.$env.php");
 
+// templates
+$container['view'] = function() use ($container){
+    $view = new \Slim\Views\Twig(APP_ROOT . '/temp', ['cache' => APP_ROOT . '/var/temp']);
+
+    /** @var \Slim\Router $router */
+    $router = $container->get('router');
+
+    $uri = \Slim\Http\Uri::createFromEnvironment(new \Slim\Http\Environment($_SERVER));
+
+    $view->addExtension(new \Slim\Views\TwigExtension($router, $uri));
+
+    return $view;
+};
+
+// doctrine
 $container[EntityManager::class] = function (Container $container): EntityManager {
     $config = Setup::createAnnotationMetadataConfiguration(
         $container['settings']['doctrine']['metadata_dirs'],

@@ -19,6 +19,7 @@ $debug = $_ENV['APP_DEBUG']??false;
 if($debug){
     \Symfony\Component\Debug\Debug::enable();
     \Symfony\Component\Debug\ExceptionHandler::register();
+    \Symfony\Component\Debug\DebugClassLoader::enable();
 }
 
 // 加载配置
@@ -31,6 +32,12 @@ if(false === $config){
 @include APP_ROOT . "/src/bootstrap.php";
 
 $app = new \Slim\App($container);
+
+// 加载路由
 include APP_ROOT . "/config/router.php";
 
-$app->run();
+try{
+    $app->run();
+} catch (\Exception $e){
+    print_r($e->getMessage());
+}
